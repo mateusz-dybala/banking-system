@@ -9,18 +9,7 @@ void search_menu();
 void transfer_money_menu();
 void deposit_money_menu();
 void withdraw_money_menu();
-
-
-int get_input(char* line, int size) {
-    char next;
-    int index = 0;
-    while((next=getchar())!='\n' && index < size) {
-        line[index] = next;
-        index++;
-    }
-    if (index == 0) return 0;
-    return 1;
-}
+void add_account();
 
 
 void main_menu() {
@@ -33,7 +22,8 @@ void main_menu() {
                "3. Make a transfer\n"
                "4. Make a deposit\n"
                "5. Make a withdrawal\n"
-               "6. Close programme\n"
+               "6. Add new account\n"
+               "7. Close programme\n"
                "Enter number corresponding to the option:");
         sc = scanf("%d", &option);
         while (getchar()!='\n');
@@ -55,6 +45,9 @@ void main_menu() {
             withdraw_money_menu();
             break;
         case 6:
+            add_account();
+            break;
+        case 7:
             return;
         default:
             break;
@@ -148,6 +141,39 @@ void withdraw_money_menu() {
 }
 
 
+void add_account() {
+    int sc;
+    char name[31];
+    char surname[31];
+    char address[12];
+    char pesel[12];
+    double balance;
+
+    do {
+        printf("To create an account enter corresponding fields:\n");
+        printf("Name:");
+        sc = scanf("%30s", name);
+        while (getchar()!='\n');
+
+        printf("Surname:");
+        sc += scanf("%30s", surname);
+        while (getchar()!='\n');
+
+        printf("Address:");
+        fgets(address, sizeof address, stdin);
+        while (getchar()!='\n');
+
+        printf("Pesel:");
+        sc += scanf("%11s", pesel);
+        while (getchar()!='\n');
+
+        printf("Balance:");
+        sc += scanf("%lf", &balance);
+        while (getchar()!='\n');
+    } while (sc != 4 || balance <= 0);
+
+    printf("Account: %s %s %s %s %.2lf", name, surname, address, pesel, balance);
+}
 
 
 
