@@ -1,6 +1,6 @@
 all: bank
 
-bank: main.o bank.o menus.o
+bank: main.o bank.o menus.o validity.o
 	gcc -g $^ -o $@
 
 .c.o:
@@ -12,5 +12,7 @@ bank.o: bank.c
 
 menus.o: menus.c menus.h
 
+validity.o: validity.c
+
 clean:
-	-rm main.o bank.o menus.o bank
+	-rm main.o bank.o menus.o validity.o bank

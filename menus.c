@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <string.h>
+#include "bank.h"
+#include "validity.h"
 
 #define MAX_LINE_LEN 60
 #define ACC_NUM_LEN 5
@@ -145,7 +148,7 @@ void add_account() {
     int sc;
     char name[31];
     char surname[31];
-    char address[12];
+    char address[51];
     char pesel[12];
     double balance;
 
@@ -154,25 +157,30 @@ void add_account() {
         printf("Name:");
         sc = scanf("%30s", name);
         while (getchar()!='\n');
+        if (!is_valid_name(name)) continue;
 
         printf("Surname:");
         sc += scanf("%30s", surname);
         while (getchar()!='\n');
+        if (!is_valid_name(surname)) continue;
 
         printf("Address:");
-        fgets(address, sizeof address, stdin);
+        sc += scanf("%50[^\n]", address);
         while (getchar()!='\n');
+        if (!is_valid_address(address)) continue;
 
         printf("Pesel:");
         sc += scanf("%11s", pesel);
         while (getchar()!='\n');
+        if (!is_valid_pesel(pesel)) continue;
 
         printf("Balance:");
         sc += scanf("%lf", &balance);
         while (getchar()!='\n');
-    } while (sc != 4 || balance <= 0);
+    } while (sc != 5 || balance < 0);
 
-    printf("Account: %s %s %s %s %.2lf", name, surname, address, pesel, balance);
+    int acc_num = save_account(name, surname, address, pesel, balance);
+    printf("Account number %05d saved\n", acc_num);
 }
 
 
