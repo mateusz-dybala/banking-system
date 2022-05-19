@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 #define FILE_NAME "data.txt"
 
@@ -114,16 +116,68 @@ int change_balance(int acc_num, double value) {
 }
 
 
+char* to_lower(char* str) {
+    int index = 0;
+    while (str[index] != '\0') {
+        str[index] = (char) tolower(str[index]);
+        index++;
+    }
+    return str;
+}
 
 
+int check_fields(Account account, int field, char* query) {
+    switch (field) {
+        case 1:
+            if (account.number == strtol(query, NULL, 10))
+                return 1;
+        case 2:
+            if (strstr(to_lower(account.name), query))
+                return 1;
+        case 3:
+            if (strstr(to_lower(account.surname), query))
+                return 1;
+        case 4:
+            if (strstr(to_lower(account.address), query))
+                return 1;
+        case 5:
+            if (strstr(to_lower(account.pesel), query))
+                return 1;
+        default:
+            return 0;
+    }
+}
 
 
+void search_for_accounts(int field, char* query) {
+    FILE *fp = fopen(FILE_NAME, "r");
+    int max_size = get_number_of_accounts(fp);
+    rewind(fp);
 
+    Account results[max_size];
+    int size = 0;
+    while (!feof(fp)) {
+        Account account = load_Account(fp);
 
+        if (check_fields(account, field, to_lower(query))) {
+            results[size] = account;
+            size++;
+        }
+    }
+    fclose(fp);
 
-
-
-
-
-
-
+    printf("Found %d %s:\n\n", size, size == 1 ? "result" : "results");
+    for (int index = 0; index < size; index++) {
+        printf("Account number: %05d\n"
+               "Name: %s %s\n"
+               "Pesel: %s\n"
+               "Address: %s\n"
+               "Balance: %.2lf\n\n",
+               results[index].number,
+               results[index].name,
+               results[index].surname,
+               results[index].pesel,
+               results[index].address,
+               results[index].balance);
+    }
+}

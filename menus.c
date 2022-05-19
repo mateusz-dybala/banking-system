@@ -74,12 +74,14 @@ void search_menu() {
                "5. Pesel\n"
                "Enter corresponding number:");
         sc = scanf("%d", &option);
+        while (getchar()!='\n');
+        if (sc == 0) continue;
 
         printf("Enter searched phrase:");
-        sc += scanf("%s", search_query);\
+        sc += scanf("%s", search_query);
     } while (sc != 2 || option < 1 || option > 5);
 
-    printf("%d: %s\n", option, search_query);
+    search_for_accounts(option, search_query);
 }
 
 void transfer_money_menu() {
