@@ -34,6 +34,7 @@ void main_menu() {
 
     switch (option) {
         case 1:
+            print_accounts();
             break;
         case 2:
             search_menu();
@@ -82,19 +83,17 @@ void search_menu() {
 }
 
 void transfer_money_menu() {
-    int sc;
+    int sc, account_from, account_to;
     double amount;
-    char account_from[ACC_NUM_LEN + 1];
-    char account_to[ACC_NUM_LEN + 1];
 
     do {
         printf("To make a money transfer enter corresponding fields:\n");
         printf("Transfer from (account number):");
-        sc = scanf("%5s", account_from);
+        sc = scanf("%d", &account_from);
         while (getchar()!='\n');
 
         printf("Transfer to (account number):");
-        sc += scanf("%5s", account_to);
+        sc += scanf("%d", &account_to);
         while (getchar()!='\n');
 
         printf("Transfer amount:");
@@ -102,18 +101,26 @@ void transfer_money_menu() {
         while (getchar()!='\n');
     } while (sc != 3);
 
-    printf("From %s to %s transfer %.2lf\n", account_from, account_to, amount);
+    if (is_account_in_database(account_from) && is_account_in_database(account_to)) {
+        if (!change_balance(account_from, -amount)) {
+            printf("Not enough balance to make a transfer\n");
+            return;
+        }
+        change_balance(account_to, amount);
+        printf("Transferred %.2lf from %05d to %05d\n", amount, account_from, account_to);
+    }else {
+        printf("Account not in database\n");
+    }
 }
 
 void deposit_money_menu() {
-    int sc;
+    int sc, acc_num;
     double amount;
-    char account[ACC_NUM_LEN + 1];
 
     do {
         printf("To deposit money enter corresponding fields:\n");
         printf("Deposit to (account number):");
-        sc = scanf("%5s", account);
+        sc = scanf("%d", &acc_num);
         while (getchar()!='\n');
 
         printf("Deposit amount:");
@@ -121,18 +128,21 @@ void deposit_money_menu() {
         while (getchar()!='\n');
     } while (sc != 2 || amount <= 0);
 
-    printf("Deposited %.2lf to account %s\n", amount, account);
+    if (change_balance(acc_num, amount)) {
+        printf("Deposited %.2lf to account %05d\n", amount, acc_num);
+    }else {
+        printf("Account not in database\n");
+    }
 }
 
 void withdraw_money_menu() {
-    int sc;
+    int sc, acc_num;
     double amount;
-    char account[ACC_NUM_LEN + 1];
 
     do {
         printf("To withdraw money enter corresponding fields:\n");
         printf("Withdraw from (account number):");
-        sc = scanf("%5s", account);
+        sc = scanf("%d", &acc_num);
         while (getchar()!='\n');
 
         printf("Withdraw amount:");
@@ -140,7 +150,15 @@ void withdraw_money_menu() {
         while (getchar()!='\n');
     } while (sc != 2 || amount <= 0);
 
-    printf("Withdrawn %.2lf from account %s\n", amount, account);
+    int success = change_balance(acc_num, -amount);
+    if (success) {
+        printf("Withdraw  %.2lf from account %05d\n", amount, acc_num);
+    }
+    if(success == -1){
+        printf("Account not in database\n");
+    }else {
+        printf("Not enough balance\n");
+    }
 }
 
 

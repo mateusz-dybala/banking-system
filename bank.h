@@ -3,7 +3,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-int get_number_of_accounts(FILE *fp);
+typedef struct Account Account;
+int get_number_of_accounts(FILE*);
 int save_account(char*, char*, char*, char*, double);
+Account load_Account(FILE*);
+int is_account_in_database(int);
+void print_accounts();
+int change_balance(int, double);
 
 #endif /* __BANK_H__ */

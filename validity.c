@@ -37,7 +37,7 @@ int is_valid_address(char* address) {
     char char_value = address[index];
 
     while (char_value != '\0') {
-        if ((!isalpha(char_value) && char_value != SPACE) || index >= MAX_ADDRESS_LEN || char_value == SEMICOLON) {
+        if ((!isalnum(char_value) && char_value != SPACE) || index >= MAX_ADDRESS_LEN || char_value == SEMICOLON) {
             return 0;
         }
 
