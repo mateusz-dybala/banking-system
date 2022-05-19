@@ -2,22 +2,24 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "validity.h"
 
 #define FILE_NAME "data.txt"
+#define FILE_TEMP "temp.txt"
 
 typedef struct Account {
     int number;
-    char name[31];
-    char surname[31];
-    char address[31];
-    char pesel[12];
+    char name[MAX_NAME_LEN + 1];
+    char surname[MAX_NAME_LEN + 1];
+    char address[MAX_ADDRESS_LEN + 1];
+    char pesel[PESEL_LEN + 1];
     double balance;
 } Account;
 
 
 int get_number_of_accounts(FILE *fp) {
     int len = 0;
-    char next;
+    int next;
 
     while ((next = fgetc(fp)) != EOF)
         if (next == '\n') len++;
@@ -30,7 +32,14 @@ int save_account(char* name, char* surname, char* address, char* pesel, double b
     FILE* fp = fopen(FILE_NAME, "a+");
 
     int account_number = 1 + get_number_of_accounts(fp);
-    fprintf(fp, "%d;%s;%s;%s;%s;%.2lf;\n", account_number, name, surname, address, pesel, balance);
+    fprintf(fp,
+            "%d;%s;%s;%s;%s;%.2lf;\n",
+            account_number,
+            name,
+            surname,
+            address,
+            pesel,
+            balance);
 
     fclose(fp);
     return account_number;
@@ -39,16 +48,23 @@ int save_account(char* name, char* surname, char* address, char* pesel, double b
 
 Account load_Account(FILE *fp) {
     Account account;
-    fscanf(fp, "%d;%30[^;];%30[^;];%50[^;];%11[^;];%lf;\n", &account.number, account.name, account.surname, account.address, account.pesel, &account.balance);
+    fscanf(fp,
+           "%d;%30[^;];%30[^;];%50[^;];%11[^;];%lf;\n",
+           &account.number,
+           account.name,
+           account.surname,
+           account.address,
+           account.pesel,
+           &account.balance);
+
     return account;
 }
 
 
 int is_account_in_database(int acc_num) {
+    Account account;
     FILE *fp = fopen(FILE_NAME, "r");
     if (fp == NULL) return 0;
-
-    Account account;
 
     while (!feof(fp)) {
         account = load_Account(fp);
@@ -57,20 +73,21 @@ int is_account_in_database(int acc_num) {
             return 1;
         }
     }
+
     fclose(fp);
     return 0;
 }
 
-// TODO https://www.geeksforgeeks.org/using-variable-format-specifier-c/
+
 void print_accounts() {
+    Account account;
     FILE *fp = fopen(FILE_NAME, "r");
     if (fp == NULL) {
         printf("No accounts in database\n");
         return;
     }
-    Account account;
 
-    printf("\n");
+    printf("Accounts in database:\n\n");
     while (!feof(fp)) {
         account = load_Account(fp);
         printf("Account number: %05d\n"
@@ -78,16 +95,22 @@ void print_accounts() {
                "Pesel: %s\n"
                "Address: %s\n"
                "Balance: %.2lf\n\n",
-               account.number, account.name, account.surname, account.pesel, account.address, account.balance);
+               account.number,
+               account.name,
+               account.surname,
+               account.pesel,
+               account.address,
+               account.balance);
     }
+
     fclose(fp);
 }
 
 
 int change_balance(int acc_num, double value) {
     FILE *fp = fopen(FILE_NAME, "r");
-    char *temp_name = "temp.txt";
-    FILE *temp = fopen(temp_name, "w");
+    if (fp == NULL) return 0;
+    FILE *temp = fopen(FILE_TEMP, "w");
 
     Account account;
     int success = 0;
@@ -99,29 +122,38 @@ int change_balance(int acc_num, double value) {
             account.balance += value;
             success = 1;
         }
-        fprintf(temp, "%d;%s;%s;%s;%s;%.2lf;\n", account.number, account.name, account.surname, account.address, account.pesel, account.balance);
+
+        fprintf(temp,
+                "%d;%s;%s;%s;%s;%.2lf;\n",
+                account.number,
+                account.name,
+                account.surname,
+                account.address,
+                account.pesel,
+                account.balance);
     }
     fclose(fp);
     fclose(temp);
 
     if (!success) {
-        remove(temp_name);
+        remove(FILE_TEMP);
         return 0;
     }
 
     remove(FILE_NAME);
-    rename(temp_name, FILE_NAME);
+    rename(FILE_TEMP, FILE_NAME);
     return 1;
-
 }
 
 
 char* to_lower(char* str) {
     int index = 0;
+
     while (str[index] != '\0') {
         str[index] = (char) tolower(str[index]);
         index++;
     }
+
     return str;
 }
 
@@ -156,6 +188,7 @@ void search_for_accounts(int field, char* query) {
 
     Account results[max_size];
     int size = 0;
+
     while (!feof(fp)) {
         Account account = load_Account(fp);
 

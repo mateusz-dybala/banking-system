@@ -1,10 +1,6 @@
 #include <stdio.h>
-#include <string.h>
 #include "bank.h"
 #include "validity.h"
-
-#define MAX_LINE_LEN 60
-#define ACC_NUM_LEN 5
 
 
 void main_menu();
@@ -20,6 +16,7 @@ void main_menu() {
     int option = -1;
 
     while (sc != 1) {
+        printf("-------------------------------------------\n");
         printf("1. List all accounts\n"
                "2. Search by field\n"
                "3. Make a transfer\n"
@@ -32,6 +29,7 @@ void main_menu() {
         while (getchar()!='\n');
     }
 
+    printf("-------------------------------------------\n");
     switch (option) {
         case 1:
             print_accounts();
@@ -63,7 +61,7 @@ void main_menu() {
 void search_menu() {
     int sc;
     int option = -1;
-    char search_query[MAX_LINE_LEN];
+    char search_query[51];
 
     do {
         printf("Search by:\n"
@@ -78,7 +76,7 @@ void search_menu() {
         if (sc == 0) continue;
 
         printf("Enter searched phrase:");
-        sc += scanf("%s", search_query);
+        sc += scanf("%50[^\n]", search_query);
     } while (sc != 2 || option < 1 || option > 5);
 
     search_for_accounts(option, search_query);
@@ -103,6 +101,7 @@ void transfer_money_menu() {
         while (getchar()!='\n');
     } while (sc != 3);
 
+    amount = ((int) (amount * 100)) / 100;
     if (is_account_in_database(account_from) && is_account_in_database(account_to)) {
         if (!change_balance(account_from, -amount)) {
             printf("Not enough balance to make a transfer\n");
@@ -130,6 +129,7 @@ void deposit_money_menu() {
         while (getchar()!='\n');
     } while (sc != 2 || amount <= 0);
 
+    amount = ((int) (amount * 100)) / 100;
     if (change_balance(acc_num, amount)) {
         printf("Deposited %.2lf to account %05d\n", amount, acc_num);
     }else {
@@ -152,6 +152,7 @@ void withdraw_money_menu() {
         while (getchar()!='\n');
     } while (sc != 2 || amount <= 0);
 
+    amount = ((int) (amount * 100)) / 100;
     int success = change_balance(acc_num, -amount);
     if (success) {
         printf("Withdraw  %.2lf from account %05d\n", amount, acc_num);
@@ -166,10 +167,10 @@ void withdraw_money_menu() {
 
 void add_account() {
     int sc;
-    char name[31];
-    char surname[31];
-    char address[51];
-    char pesel[12];
+    char name[MAX_NAME_LEN + 1];
+    char surname[MAX_NAME_LEN + 1];
+    char address[MAX_ADDRESS_LEN + 1];
+    char pesel[PESEL_LEN + 1];
     double balance;
 
     do {
@@ -199,20 +200,7 @@ void add_account() {
         while (getchar()!='\n');
     } while (sc != 5 || balance < 0);
 
+    balance = ((int) (balance * 100)) / 100;
     int acc_num = save_account(name, surname, address, pesel, balance);
     printf("Account number %05d saved\n", acc_num);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

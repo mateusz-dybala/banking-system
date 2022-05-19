@@ -30,6 +30,7 @@ int is_valid_name(char* name) {
     return 1;
 }
 
+
 int is_valid_address(char* address) {
     if (address == NULL) return 0;
 
@@ -52,6 +53,7 @@ int is_valid_address(char* address) {
     return 1;
 }
 
+
 int is_valid_pesel(char* pesel) {
     int index = 0;
     char char_value = pesel[index];
@@ -67,29 +69,3 @@ int is_valid_pesel(char* pesel) {
     if (index != PESEL_LEN) return 0;
     return 1;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

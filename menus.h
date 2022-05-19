@@ -2,8 +2,8 @@
 #define __MENUS_H__
 
 #include <stdio.h>
-#include <string.h>
 #include "bank.h"
+#include "validity.h"
 void main_menu();
 void search_menu();
 void transfer_money_menu();

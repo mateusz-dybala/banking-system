@@ -3,6 +3,9 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include "validity.h"
 typedef struct Account Account;
 int get_number_of_accounts(FILE*);
 int save_account(char*, char*, char*, char*, double);
