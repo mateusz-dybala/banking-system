@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <ctype.h>
 #include "bank.h"
 #include "validity.h"
 
@@ -84,6 +85,7 @@ void search_menu() {
 
 void transfer_money_menu() {
     int sc, account_from, account_to;
+    char confirm;
     double amount;
 
     do {
@@ -101,7 +103,18 @@ void transfer_money_menu() {
         while (getchar()!='\n');
     } while (sc != 3);
 
-    amount = ((int) (amount * 100)) / 100;
+    do {
+        printf("Do you want to transfer %.2lf from %05d to %05d (y or n):", amount, account_from, account_to);
+        sc = scanf("%c", &confirm);
+        confirm = (char) tolower(confirm);
+        while (getchar()!='\n');
+
+        if (confirm == 'n') {
+            return;
+        }
+    } while (confirm != 'y' || sc != 1);
+
+    amount = ((int) (amount * 100)) / 100.0;
     if (is_account_in_database(account_from) && is_account_in_database(account_to)) {
         if (!change_balance(account_from, -amount)) {
             printf("Not enough balance to make a transfer\n");
@@ -116,6 +129,7 @@ void transfer_money_menu() {
 
 void deposit_money_menu() {
     int sc, acc_num;
+    char confirm;
     double amount;
 
     do {
@@ -129,7 +143,18 @@ void deposit_money_menu() {
         while (getchar()!='\n');
     } while (sc != 2 || amount <= 0);
 
-    amount = ((int) (amount * 100)) / 100;
+    do {
+        printf("Do you want to deposit %.2lf to %05d (y or n):", amount, acc_num);
+        sc = scanf("%c", &confirm);
+        confirm = (char) tolower(confirm);
+        while (getchar()!='\n');
+
+        if (confirm == 'n') {
+            return;
+        }
+    } while (confirm != 'y' || sc != 1);
+
+    amount = ((int) (amount * 100)) / 100.0;
     if (change_balance(acc_num, amount)) {
         printf("Deposited %.2lf to account %05d\n", amount, acc_num);
     }else {
@@ -139,6 +164,7 @@ void deposit_money_menu() {
 
 void withdraw_money_menu() {
     int sc, acc_num;
+    char confirm;
     double amount;
 
     do {
@@ -152,15 +178,30 @@ void withdraw_money_menu() {
         while (getchar()!='\n');
     } while (sc != 2 || amount <= 0);
 
-    amount = ((int) (amount * 100)) / 100;
+    do {
+        printf("Do you want to withdraw %.2lf from %05d (y or n):", amount, acc_num);
+        sc = scanf("%c", &confirm);
+        confirm = (char) tolower(confirm);
+        while (getchar()!='\n');
+
+        if (confirm == 'n') {
+            return;
+        }
+    } while (confirm != 'y' || sc != 1);
+
+    amount = ((int) (amount * 100)) / 100.0;
     int success = change_balance(acc_num, -amount);
-    if (success) {
-        printf("Withdraw  %.2lf from account %05d\n", amount, acc_num);
+    if (success == 1) {
+        printf("Withdraw %.2lf from account %05d\n", amount, acc_num);
+        return;
     }
     if(success == -1){
         printf("Account not in database\n");
-    }else {
+        return;
+    }
+    if (success == 0){
         printf("Not enough balance\n");
+        return;
     }
 }
 
@@ -200,7 +241,7 @@ void add_account() {
         while (getchar()!='\n');
     } while (sc != 5 || balance < 0);
 
-    balance = ((int) (balance * 100)) / 100;
+    balance = ((int) (balance * 100)) / 100.0;
     int acc_num = save_account(name, surname, address, pesel, balance);
     printf("Account number %05d saved\n", acc_num);
 }

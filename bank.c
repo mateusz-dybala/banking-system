@@ -113,14 +113,18 @@ int change_balance(int acc_num, double value) {
     FILE *temp = fopen(FILE_TEMP, "w");
 
     Account account;
-    int success = 0;
+    int success = -1;
 
     while (!feof(fp)) {
         account = load_Account(fp);
 
-        if (account.number == acc_num && account.balance - value >= 0) {
-            account.balance += value;
-            success = 1;
+        if (account.number == acc_num) {
+            if (account.balance + value >= 0) {
+                account.balance += value;
+                success = 1;
+            }else {
+                success = 0;
+            }
         }
 
         fprintf(temp,
@@ -135,9 +139,9 @@ int change_balance(int acc_num, double value) {
     fclose(fp);
     fclose(temp);
 
-    if (!success) {
+    if (success != 1) {
         remove(FILE_TEMP);
-        return 0;
+        return success;
     }
 
     remove(FILE_NAME);
@@ -163,21 +167,27 @@ int check_fields(Account account, int field, char* query) {
         case 1:
             if (account.number == strtol(query, NULL, 10))
                 return 1;
+            break;
         case 2:
             if (strstr(to_lower(account.name), query))
                 return 1;
+            break;
         case 3:
             if (strstr(to_lower(account.surname), query))
                 return 1;
+            break;
         case 4:
             if (strstr(to_lower(account.address), query))
                 return 1;
+            break;
         case 5:
             if (strstr(to_lower(account.pesel), query))
                 return 1;
+            break;
         default:
             return 0;
     }
+    return 0;
 }
 
 
